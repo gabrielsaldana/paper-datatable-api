@@ -5,11 +5,11 @@
     <title>paper-datatable-api test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../paper-datatable-api.html">
-    <link rel="import" href="../paper-datatable-api-column.html">
+    <script type="module" src="../paper-datatable-api.js"></script>
+    <script type="module" src="../paper-datatable-api-column.js"></script>
   </head>
   <body>
 
@@ -47,107 +47,110 @@
       </template>
     </test-fixture>
 
-    <script>
-      var data = [
+    <script type="module">
+import '../paper-datatable-api.js';
+import '../paper-datatable-api-column.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+var data = [
 {
-  "color": "yellow",
-  "fruit": "banana"
+"color": "yellow",
+"fruit": "banana"
 },
 {
-  "fruit": "apple",
-  "color": "green"
+"fruit": "apple",
+"color": "green"
 }
-      ];
+];
 
-      suite('paper-datatable-api', function() {
+suite('paper-datatable-api', function() {
 
-        test('Select row', function(done) {
-          var paperDatatableApi = fixture('selectable');
-          paperDatatableApi.data = data;
+  test('Select row', function(done) {
+    var paperDatatableApi = fixture('selectable');
+    paperDatatableApi.data = data;
+    flush(function() {
+      var i = 0;
+      var paperCheckbox = dom(paperDatatableApi.root)
+        .querySelector('tbody tr td:first-child paper-checkbox');
+      paperDatatableApi.addEventListener('selection-changed', function(event) {
+        if (i === 0) {
+          assert.equal(event.detail.selected, 0);
+          assert.equal(event.detail.data, data[0]);
+          i++;
           flush(function() {
-            var i = 0;
-            var paperCheckbox = Polymer.dom(paperDatatableApi.root)
-              .querySelector('tbody tr td:first-child paper-checkbox');
-            paperDatatableApi.addEventListener('selection-changed', function(event) {
-              if (i === 0) {
-                assert.equal(event.detail.selected, 0);
-                assert.equal(event.detail.data, data[0]);
-                i++;
-                flush(function() {
-                  paperCheckbox.click();
-                });
-              } else {
-                assert.equal(event.detail.deselected, 0);
-                assert.equal(event.detail.data, data[0]);
-                done();
-              }
-            });
             paperCheckbox.click();
           });
-        });
-
-        test('Select all rows', function(done) {
-          var paperDatatableApi = fixture('selectable');
-          paperDatatableApi.data = data;
-          flush(function() {
-            var i = 0;
-            var paperCheckbox = Polymer.dom(paperDatatableApi.root)
-              .querySelector('thead tr th:first-child paper-checkbox');
-            paperDatatableApi.addEventListener('selection-changed', function(event) {
-              switch(i) {
-                case 0:
-                  assert.equal(event.detail.selected, 0);
-                  assert.equal(event.detail.data, data[0]);
-                  break;
-                case 1:
-                  assert.equal(event.detail.selected, 1);
-                  assert.equal(event.detail.data, data[1]);
-                  flush(function() {
-                    paperCheckbox.click();
-                  });
-                  break;
-                case 2:
-                  assert.equal(event.detail.deselected, 0);
-                  assert.equal(event.detail.data, data[0]);
-                  break;
-                case 3:
-                  assert.equal(event.detail.deselected, 1);
-                  assert.equal(event.detail.data, data[1]);
-                  done();
-                  break;
-              }
-              i++;
-            });
-            paperCheckbox.click();
-          });
-        });
-
-        test('Select rows with specific key', function() {
-          var paperDatatableApi = fixture('selectableWithKey');
-          paperDatatableApi.data = data;
-          flush(function() {
-            var i = 0;
-            var paperCheckbox = Polymer.dom(paperDatatableApi.root)
-              .querySelector('tbody tr td:first-child paper-checkbox');
-            paperCheckbox.click();
-            assert.equal(paperDatatableApi.selectedRows.length, 1);
-            assert.equal(paperDatatableApi.selectedRows[0], 'banana');
-          });
-        });
-
-        test('Select all rows without the checkbox', function() {
-          var paperDatatableApi = fixture('selectable');
-
-          paperDatatableApi.allowTheSelectionOfAllTheElements = false;
-          paperDatatableApi.data = data;
-          flush(function() {
-            var i = 0;
-            var paperCheckbox = Polymer.dom(paperDatatableApi.root)
-              .querySelector('thead tr th:first-child paper-checkbox');
-            assert.isNull(paperCheckbox);
-          });
-        });
+        } else {
+          assert.equal(event.detail.deselected, 0);
+          assert.equal(event.detail.data, data[0]);
+          done();
+        }
       });
-    </script>
+      paperCheckbox.click();
+    });
+  });
+
+  test('Select all rows', function(done) {
+    var paperDatatableApi = fixture('selectable');
+    paperDatatableApi.data = data;
+    flush(function() {
+      var i = 0;
+      var paperCheckbox = dom(paperDatatableApi.root)
+        .querySelector('thead tr th:first-child paper-checkbox');
+      paperDatatableApi.addEventListener('selection-changed', function(event) {
+        switch(i) {
+          case 0:
+            assert.equal(event.detail.selected, 0);
+            assert.equal(event.detail.data, data[0]);
+            break;
+          case 1:
+            assert.equal(event.detail.selected, 1);
+            assert.equal(event.detail.data, data[1]);
+            flush(function() {
+              paperCheckbox.click();
+            });
+            break;
+          case 2:
+            assert.equal(event.detail.deselected, 0);
+            assert.equal(event.detail.data, data[0]);
+            break;
+          case 3:
+            assert.equal(event.detail.deselected, 1);
+            assert.equal(event.detail.data, data[1]);
+            done();
+            break;
+        }
+        i++;
+      });
+      paperCheckbox.click();
+    });
+  });
+
+  test('Select rows with specific key', function() {
+    var paperDatatableApi = fixture('selectableWithKey');
+    paperDatatableApi.data = data;
+    flush(function() {
+      var i = 0;
+      var paperCheckbox = dom(paperDatatableApi.root)
+        .querySelector('tbody tr td:first-child paper-checkbox');
+      paperCheckbox.click();
+      assert.equal(paperDatatableApi.selectedRows.length, 1);
+      assert.equal(paperDatatableApi.selectedRows[0], 'banana');
+    });
+  });
+
+  test('Select all rows without the checkbox', function() {
+    var paperDatatableApi = fixture('selectable');
+
+    paperDatatableApi.allowTheSelectionOfAllTheElements = false;
+    paperDatatableApi.data = data;
+    flush(function() {
+      var i = 0;
+      var paperCheckbox = dom(paperDatatableApi.root)
+        .querySelector('thead tr th:first-child paper-checkbox');
+      assert.isNull(paperCheckbox);
+    });
+  });
+});
+</script>
   </body>
 </html>

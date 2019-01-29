@@ -5,11 +5,11 @@
     <title>paper-datatable-api test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../paper-datatable-api.html">
-    <link rel="import" href="../paper-datatable-api-column.html">
+    <script type="module" src="../paper-datatable-api.js"></script>
+    <script type="module" src="../paper-datatable-api-column.js"></script>
   </head>
   <body>
 
@@ -35,100 +35,103 @@
       </template>
     </test-fixture>
 
-    <script>
-      var data = [
+    <script type="module">
+import '../paper-datatable-api.js';
+import '../paper-datatable-api-column.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+var data = [
 {
-  "color": "yellow",
-  "fruit": "banana",
-  "weight": "1"
+"color": "yellow",
+"fruit": "banana",
+"weight": "1"
 },
 {
-  "fruit": "apple",
-  "color": "green",
-  "weight": "2"
+"fruit": "apple",
+"color": "green",
+"weight": "2"
 }
-      ];
+];
 
-      suite('paper-datatable-api', function() {
+suite('paper-datatable-api', function() {
 
-        test('Filters are displayed', function(done) {
-          var paperDatatableApi = fixture('filterable');
-          paperDatatableApi.data = data;
+  test('Filters are displayed', function(done) {
+    var paperDatatableApi = fixture('filterable');
+    paperDatatableApi.data = data;
 
-          flush(function() {
-            let thContent = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
-            let filterButton = Polymer.dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:search"]');
-            filterButton.click();
+    flush(function() {
+      let thContent = dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
+      let filterButton = dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:search"]');
+      filterButton.click();
 
-            flush(function() {
-              let thContent = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
-              var input = Polymer.dom(thContent.root).querySelector('paper-input');
-              assert.isTrue(input.focused);
-              done();
-            });
-          });
-        });
-
-        test('Filters are displayed when I click on header', function(done) {
-          var paperDatatableApi = fixture('filterable');
-          paperDatatableApi.data = data;
-
-          flush(function() {
-            let thContent = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
-            let filterDiv = Polymer.dom(thContent.root).querySelector('div div');
-            filterDiv.click();
-
-            flush(function() {
-              let thContent = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
-              var input = Polymer.dom(thContent.root).querySelector('paper-input');
-              assert.isTrue(input.focused);
-              done();
-            });
-          });
-        });
-
-        test('Filters are not displayed if filter is deactivated', function(done) {
-          var paperDatatableApi = fixture('filterable');
-          paperDatatableApi.data = data;
-
-          flush(function() {
-            let thsContent = Polymer.dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
-            let secondDiv = Polymer.dom(thsContent[1].root).querySelector('div div');
-            secondDiv.click();
-
-            flush(function() {
-              let thsContent = Polymer.dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
-              let secondDivForInput = Polymer.dom(thsContent[1].root).querySelector('paper-input');
-              assert.isNull(secondDivForInput);
-              done();
-            });
-          });
-        });
-
-        test('Filters with choice are displayed', function(done) {
-          var paperDatatableApi = fixture('filterable');
-          paperDatatableApi.data = data;
-
-          let i = 0;
-
-          paperDatatableApi.addEventListener('filter', event => {
-            assert.equal(event.detail.filter.property, 'weight');
-            i += 1;
-            if (i === 1) {
-              assert.equal(event.detail.filter.value[0], 1);
-            }
-            done();
-          });
-          flush(function() {
-            paperDatatableApi.async(() => {
-              let thContent = Polymer.dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
-              var paperMenu = Polymer.dom(thContent[2].root).querySelector('paper-listbox');
-              paperMenu.select(1);
-            }, 100);
-          });
-        });
-
+      flush(function() {
+        let thContent = dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
+        var input = dom(thContent.root).querySelector('paper-input');
+        assert.isTrue(input.focused);
+        done();
       });
-    </script>
+    });
+  });
+
+  test('Filters are displayed when I click on header', function(done) {
+    var paperDatatableApi = fixture('filterable');
+    paperDatatableApi.data = data;
+
+    flush(function() {
+      let thContent = dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
+      let filterDiv = dom(thContent.root).querySelector('div div');
+      filterDiv.click();
+
+      flush(function() {
+        let thContent = dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content');
+        var input = dom(thContent.root).querySelector('paper-input');
+        assert.isTrue(input.focused);
+        done();
+      });
+    });
+  });
+
+  test('Filters are not displayed if filter is deactivated', function(done) {
+    var paperDatatableApi = fixture('filterable');
+    paperDatatableApi.data = data;
+
+    flush(function() {
+      let thsContent = dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
+      let secondDiv = dom(thsContent[1].root).querySelector('div div');
+      secondDiv.click();
+
+      flush(function() {
+        let thsContent = dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
+        let secondDivForInput = dom(thsContent[1].root).querySelector('paper-input');
+        assert.isNull(secondDivForInput);
+        done();
+      });
+    });
+  });
+
+  test('Filters with choice are displayed', function(done) {
+    var paperDatatableApi = fixture('filterable');
+    paperDatatableApi.data = data;
+
+    let i = 0;
+
+    paperDatatableApi.addEventListener('filter', event => {
+      assert.equal(event.detail.filter.property, 'weight');
+      i += 1;
+      if (i === 1) {
+        assert.equal(event.detail.filter.value[0], 1);
+      }
+      done();
+    });
+    flush(function() {
+      paperDatatableApi.async(() => {
+        let thContent = dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
+        var paperMenu = dom(thContent[2].root).querySelector('paper-listbox');
+        paperMenu.select(1);
+      }, 100);
+    });
+  });
+
+});
+</script>
   </body>
 </html>

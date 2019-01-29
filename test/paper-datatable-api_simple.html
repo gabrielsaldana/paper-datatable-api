@@ -5,11 +5,11 @@
     <title>paper-datatable-api test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../paper-datatable-api.html">
-    <link rel="import" href="../paper-datatable-api-column.html">
+    <script type="module" src="../paper-datatable-api.js"></script>
+    <script type="module" src="../paper-datatable-api-column.js"></script>
   </head>
   <body>
 
@@ -35,94 +35,97 @@
       </template>
     </test-fixture>
 
-    <script>
-      var data = [
+    <script type="module">
+import '../paper-datatable-api.js';
+import '../paper-datatable-api-column.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+var data = [
 {
-  "color": "yellow",
-  "fruit": "banana"
+"color": "yellow",
+"fruit": "banana"
 },
 {
-  "fruit": "apple",
-  "color": "green"
+"fruit": "apple",
+"color": "green"
 }
-      ];
+];
 
-      suite('paper-datatable-api', function() {
+suite('paper-datatable-api', function() {
 
-        test('Headers are setted', function(done) {
-          var paperDatatableApi = fixture('simple');
-          paperDatatableApi.data = data;
+  test('Headers are setted', function(done) {
+    var paperDatatableApi = fixture('simple');
+    paperDatatableApi.data = data;
 
-          flush(function() {
-            var thContent = Polymer.dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
-            var th1 = Polymer.dom(thContent[0].root).querySelector('div');
-            assert.equal(th1.textContent.trim(), 'Fruit');
-            var th2 = Polymer.dom(thContent[1].root).querySelector('div');
-            assert.equal(th2.textContent.trim(), 'Color');
-            var th3 = Polymer.dom(thContent[2].root).querySelector('div');
-            assert.equal(th3.textContent.trim(), 'Color + fruit');
-            assert.equal(thContent.length, 3);
-            done();
-          });
-        });
+    flush(function() {
+      var thContent = dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
+      var th1 = dom(thContent[0].root).querySelector('div');
+      assert.equal(th1.textContent.trim(), 'Fruit');
+      var th2 = dom(thContent[1].root).querySelector('div');
+      assert.equal(th2.textContent.trim(), 'Color');
+      var th3 = dom(thContent[2].root).querySelector('div');
+      assert.equal(th3.textContent.trim(), 'Color + fruit');
+      assert.equal(thContent.length, 3);
+      done();
+    });
+  });
 
-        test('Have 2 rows', function(done) {
-          var paperDatatableApi = fixture('simple');
-          paperDatatableApi.data = data;
+  test('Have 2 rows', function(done) {
+    var paperDatatableApi = fixture('simple');
+    paperDatatableApi.data = data;
 
-          flush(function() {
-            var trs = Polymer.dom(paperDatatableApi.root).querySelectorAll('tbody tr');
-            assert.equal(trs.length, 2);
-            done();
-          });
-        });
+    flush(function() {
+      var trs = dom(paperDatatableApi.root).querySelectorAll('tbody tr');
+      assert.equal(trs.length, 2);
+      done();
+    });
+  });
 
-        test('Column are filled', function(done) {
-          var paperDatatableApi = fixture('simple');
-          paperDatatableApi.data = data;
+  test('Column are filled', function(done) {
+    var paperDatatableApi = fixture('simple');
+    paperDatatableApi.data = data;
 
-          flush(function() {
-            var trs = Polymer.dom(paperDatatableApi.root).querySelectorAll('tbody tr');
-            var tr1tds = trs[0].querySelectorAll('td');
-            assert.equal(tr1tds.length, 3);
-            assert.equal(tr1tds[0].querySelector('span').textContent, 'banana');
-            assert.equal(tr1tds[1].querySelector('div').textContent, 'yellow');
-            assert.equal(tr1tds[2].querySelector('div').textContent, 'banana is yellow');
+    flush(function() {
+      var trs = dom(paperDatatableApi.root).querySelectorAll('tbody tr');
+      var tr1tds = trs[0].querySelectorAll('td');
+      assert.equal(tr1tds.length, 3);
+      assert.equal(tr1tds[0].querySelector('span').textContent, 'banana');
+      assert.equal(tr1tds[1].querySelector('div').textContent, 'yellow');
+      assert.equal(tr1tds[2].querySelector('div').textContent, 'banana is yellow');
 
-            var tr2tds = trs[1].querySelectorAll('td');
-            assert.equal(tr2tds.length, 3);
-            assert.equal(tr2tds[0].querySelector('span').textContent, 'apple');
-            assert.equal(tr2tds[1].querySelector('div').textContent, 'green');
-            assert.equal(tr2tds[2].querySelector('div').textContent, 'apple is green');
-            done();
-          });
-        });
+      var tr2tds = trs[1].querySelectorAll('td');
+      assert.equal(tr2tds.length, 3);
+      assert.equal(tr2tds[0].querySelector('span').textContent, 'apple');
+      assert.equal(tr2tds[1].querySelector('div').textContent, 'green');
+      assert.equal(tr2tds[2].querySelector('div').textContent, 'apple is green');
+      done();
+    });
+  });
 
-        test('Hide and show column', function(done) {
-          var paperDatatableApi = fixture('simple');
-          paperDatatableApi.data = data;
+  test('Hide and show column', function(done) {
+    var paperDatatableApi = fixture('simple');
+    paperDatatableApi.data = data;
 
-          flush(function() {
-            var trs = Polymer.dom(paperDatatableApi.root).querySelectorAll('tbody tr');
+    flush(function() {
+      var trs = dom(paperDatatableApi.root).querySelectorAll('tbody tr');
 
-            var tr1tds = trs[0].querySelectorAll('td');
-            assert.equal(tr1tds[0].style.display, '');
-            paperDatatableApi.toggleColumn('fruit');
-            assert.equal(tr1tds[0].style.display, 'none');
-            paperDatatableApi.toggleColumn('fruit');
-            assert.equal(tr1tds[0].style.display, 'table-cell');
-            assert.equal(tr1tds[1].style.display, '');
-            paperDatatableApi.toggleColumn('color');
-            assert.equal(tr1tds[1].style.display, '');
-            assert.equal(tr1tds[2].style.display, '');
-            paperDatatableApi.toggleColumn('weight');
-            assert.equal(tr1tds[0].style.display, 'table-cell');
-            assert.equal(tr1tds[1].style.display, '');
-            done();
-          });
-        });
+      var tr1tds = trs[0].querySelectorAll('td');
+      assert.equal(tr1tds[0].style.display, '');
+      paperDatatableApi.toggleColumn('fruit');
+      assert.equal(tr1tds[0].style.display, 'none');
+      paperDatatableApi.toggleColumn('fruit');
+      assert.equal(tr1tds[0].style.display, 'table-cell');
+      assert.equal(tr1tds[1].style.display, '');
+      paperDatatableApi.toggleColumn('color');
+      assert.equal(tr1tds[1].style.display, '');
+      assert.equal(tr1tds[2].style.display, '');
+      paperDatatableApi.toggleColumn('weight');
+      assert.equal(tr1tds[0].style.display, 'table-cell');
+      assert.equal(tr1tds[1].style.display, '');
+      done();
+    });
+  });
 
-      });
-    </script>
+});
+</script>
   </body>
 </html>

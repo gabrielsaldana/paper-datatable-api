@@ -5,11 +5,11 @@
     <title>paper-datatable-api test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../paper-datatable-api.html">
-    <link rel="import" href="../paper-datatable-api-column.html">
+    <script type="module" src="../paper-datatable-api.js"></script>
+    <script type="module" src="../paper-datatable-api-column.js"></script>
   </head>
   <body>
 
@@ -30,39 +30,42 @@
       </template>
     </test-fixture>
 
-    <script>
-      var data = [
+    <script type="module">
+import '../paper-datatable-api.js';
+import '../paper-datatable-api-column.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+var data = [
 {
-  "color": "yellow",
-  "fruit": "banana"
+"color": "yellow",
+"fruit": "banana"
 },
 {
-  "fruit": "apple",
-  "color": "green"
+"fruit": "apple",
+"color": "green"
 }
-      ];
+];
 
-      suite('paper-datatable-api', function() {
+suite('paper-datatable-api', function() {
 
-        test('Headers are setted', function(done) {
-          var paperDatatableApi = fixture('position');
-          paperDatatableApi.data = data;
+  test('Headers are setted', function(done) {
+    var paperDatatableApi = fixture('position');
+    paperDatatableApi.data = data;
 
-          flush(function() {
-            var ths = Polymer.dom(paperDatatableApi.root).querySelectorAll('thead tr th');
-            assert.equal(ths[0].getAttribute('property'), 'fruit');
-            assert.equal(ths[1].getAttribute('property'), 'color');
-            paperDatatableApi.changeColumnOrder(['color', 'fruit']);
-            assert.equal(ths[1].getAttribute('property'), 'color');
-            assert.equal(ths[0].getAttribute('property'), 'fruit');
-            paperDatatableApi.changeColumnOrder(['fruit', 'color']);
-            assert.equal(ths[0].getAttribute('property'), 'fruit');
-            assert.equal(ths[1].getAttribute('property'), 'color');
-            done();
-          });
-        });
+    flush(function() {
+      var ths = dom(paperDatatableApi.root).querySelectorAll('thead tr th');
+      assert.equal(ths[0].getAttribute('property'), 'fruit');
+      assert.equal(ths[1].getAttribute('property'), 'color');
+      paperDatatableApi.changeColumnOrder(['color', 'fruit']);
+      assert.equal(ths[1].getAttribute('property'), 'color');
+      assert.equal(ths[0].getAttribute('property'), 'fruit');
+      paperDatatableApi.changeColumnOrder(['fruit', 'color']);
+      assert.equal(ths[0].getAttribute('property'), 'fruit');
+      assert.equal(ths[1].getAttribute('property'), 'color');
+      done();
+    });
+  });
 
-      });
-    </script>
+});
+</script>
   </body>
 </html>

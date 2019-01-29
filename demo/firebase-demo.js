@@ -1,18 +1,13 @@
-<link rel="import" href="../../polymer/polymer.html">
-
-<link rel="import" href="../../iron-ajax/iron-ajax.html">
-<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../paper-card/paper-card.html">
-<link rel="import" href="../../polymerfire/firebase-app.html">
-<link rel="import" href="../../polymerfire/firebase-document.html">
-
-<link rel="import" href="../src/paper-datatable-api.html">
-<link rel="import" href="../src/paper-datatable-api-column.html">
-
-<dom-module id="firebase-demo">
-
-  <template>
-
+import '@polymer/polymer/polymer-legacy.js';
+import '@polymer/iron-ajax/iron-ajax.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/paper-card/paper-card.js';
+import 'polymerfire/firebase-app.js';
+import 'polymerfire/firebase-document.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
     <style include="iron-flex iron-flex-alignment"></style>
     <style>
       div.layout > div {
@@ -27,21 +22,16 @@
     <div class="layout horizontal center-justified">
       <div>
 
-        <firebase-app
-          auth-domain="paper-datatable-api-ca8cd.firebaseapp.com"
-          api-key="AIzaSyDZojHwPBzKX_62EI4nd59flJKzWwPZoqA"
-          database-url="https://paper-datatable-api-ca8cd.firebaseio.com">
+        <firebase-app auth-domain="paper-datatable-api-ca8cd.firebaseapp.com" api-key="AIzaSyDZojHwPBzKX_62EI4nd59flJKzWwPZoqA" database-url="https://paper-datatable-api-ca8cd.firebaseio.com">
         </firebase-app>
 
-        <firebase-document
-          path="/fruits"
-          data="{{data}}">
+        <firebase-document path="/fruits" data="{{data}}">
         </firebase-document>
 
         <paper-card heading="Data from firebase">
           <div class="card-content">
             <paper-datatable-api data="[[data]]">
-              <paper-datatable-api-column header="Fruit" property="fruit" other-properties='["color"]'>
+              <paper-datatable-api-column header="Fruit" property="fruit" other-properties="[&quot;color&quot;]">
                 <template>
                   <span>[[value]], color: [[otherValues.color]]</span>
                 </template>
@@ -62,17 +52,14 @@
 
       </div> 
     </div>
-  </template>
+`,
 
-  <script>
-    Polymer({
-      is: 'firebase-demo',
-      properties: {
-        data: {
-          type: Array,
-          value: [],
-        },
-      },
-    });
-  </script>
-</dom-module>
+  is: 'firebase-demo',
+
+  properties: {
+    data: {
+      type: Array,
+      value: [],
+    },
+  }
+});

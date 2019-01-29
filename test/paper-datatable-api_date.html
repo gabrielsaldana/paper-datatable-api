@@ -6,12 +6,12 @@
   <title>paper-datatable-api test</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+  <script src="../../wct-browser-legacy/browser.js"></script>
   <script src="../../moment/min/moment.min.js"></script>
 
-  <link rel="import" href="../paper-datatable-api.html">
-  <link rel="import" href="../paper-datatable-api-column.html">
+  <script type="module" src="../paper-datatable-api.js"></script>
+  <script type="module" src="../paper-datatable-api-column.js"></script>
 </head>
 
 <body>
@@ -38,35 +38,38 @@
     </template>
   </test-fixture>
 
-  <script>
-    var data = [
-      {
-        "color": "yellow",
-        "fruit": "banana"
-      },
-      {
-        "fruit": "apple",
-        "color": "green"
-      }
-    ];
+  <script type="module">
+import '../paper-datatable-api.js';
+import '../paper-datatable-api-column.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+var data = [
+  {
+    "color": "yellow",
+    "fruit": "banana"
+  },
+  {
+    "fruit": "apple",
+    "color": "green"
+  }
+];
 
-    suite('paper-datatable-api', function () {
+suite('paper-datatable-api', function () {
 
-      test('Headers are setted', function (done) {
-        var paperDatatableApi = fixture('date');
-        paperDatatableApi.data = data;
-        flush(function () {
-          let thContent = Polymer.dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
-          let filterButton = Polymer.dom(thContent[1].root).querySelector('paper-icon-button');
-          filterButton.click();
-          paperDatatableApi.async(function () {
-            done();
-          }, 200);
-        });
-      });
-
+  test('Headers are setted', function (done) {
+    var paperDatatableApi = fixture('date');
+    paperDatatableApi.data = data;
+    flush(function () {
+      let thContent = dom(paperDatatableApi.root).querySelectorAll('paper-datatable-api-th-content');
+      let filterButton = dom(thContent[1].root).querySelector('paper-icon-button');
+      filterButton.click();
+      paperDatatableApi.async(function () {
+        done();
+      }, 200);
     });
-  </script>
+  });
+
+});
+</script>
 </body>
 
 </html>

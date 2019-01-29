@@ -5,11 +5,11 @@
     <title>paper-datatable-api test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../paper-datatable-api.html">
-    <link rel="import" href="../paper-datatable-api-column.html">
+    <script type="module" src="../paper-datatable-api.js"></script>
+    <script type="module" src="../paper-datatable-api-column.js"></script>
   </head>
   <body>
 
@@ -30,119 +30,122 @@
       </template>
     </test-fixture>
 
-    <script>
-      var data = [
+    <script type="module">
+import '../paper-datatable-api.js';
+import '../paper-datatable-api-column.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+var data = [
 {
-  "color": "yellow",
-  "fruit": "banana"
+"color": "yellow",
+"fruit": "banana"
 },
 {
-  "fruit": "apple",
-  "color": "green"
+"fruit": "apple",
+"color": "green"
 }
-      ];
+];
 
-      suite('paper-datatable-api', function() {
+suite('paper-datatable-api', function() {
 
-        test('Next page', function() {
-          var paperDatatableApi = fixture('pagination');
-          flush(() => {
-            paperDatatableApi.data = data;
-            paperDatatableApi.page = 0;
-            paperDatatableApi.totalPages = 1;
-            Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._nextPage();
-            assert.equal(paperDatatableApi.page, 0);
-            paperDatatableApi.totalPages = 2;
-            Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._nextPage();
-            assert.equal(paperDatatableApi.page, 1);
-          });
-        });
+  test('Next page', function() {
+    var paperDatatableApi = fixture('pagination');
+    flush(() => {
+      paperDatatableApi.data = data;
+      paperDatatableApi.page = 0;
+      paperDatatableApi.totalPages = 1;
+      dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._nextPage();
+      assert.equal(paperDatatableApi.page, 0);
+      paperDatatableApi.totalPages = 2;
+      dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._nextPage();
+      assert.equal(paperDatatableApi.page, 1);
+    });
+  });
 
-        test('Prev page', function() {
-          var paperDatatableApi = fixture('pagination');
-          flush(() => {
-            paperDatatableApi.data = data;
-            paperDatatableApi.page = 0;
-            Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._prevPage();
-            assert.equal(paperDatatableApi.page, 0);
-            paperDatatableApi.page = 1;
-            Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._prevPage();
-            assert.equal(paperDatatableApi.page, 0);
-          });
-        });
+  test('Prev page', function() {
+    var paperDatatableApi = fixture('pagination');
+    flush(() => {
+      paperDatatableApi.data = data;
+      paperDatatableApi.page = 0;
+      dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._prevPage();
+      assert.equal(paperDatatableApi.page, 0);
+      paperDatatableApi.page = 1;
+      dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer')._prevPage();
+      assert.equal(paperDatatableApi.page, 0);
+    });
+  });
 
-        test('Next button status', function() {
-          var paperDatatableApi = fixture('pagination');
-          paperDatatableApi.data = data;
-          flush(() => {
-            const footer = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer');
-            assert.equal(footer._nextButtonEnabled(0, 0), false);
-            assert.equal(footer._nextButtonEnabled(0, 2), true);
-            assert.equal(footer._nextButtonEnabled(1, 2), false);
-          });
-        });
+  test('Next button status', function() {
+    var paperDatatableApi = fixture('pagination');
+    paperDatatableApi.data = data;
+    flush(() => {
+      const footer = dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer');
+      assert.equal(footer._nextButtonEnabled(0, 0), false);
+      assert.equal(footer._nextButtonEnabled(0, 2), true);
+      assert.equal(footer._nextButtonEnabled(1, 2), false);
+    });
+  });
 
-        test('Prev button status', function() {
-          var paperDatatableApi = fixture('pagination');
-          paperDatatableApi.data = data;
-          flush(() => {
-            const footer = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer');
-            assert.equal(footer._prevButtonEnabled(0), false);
-            assert.equal(footer._prevButtonEnabled(1), true);
-          }); 
-        });
+  test('Prev button status', function() {
+    var paperDatatableApi = fixture('pagination');
+    paperDatatableApi.data = data;
+    flush(() => {
+      const footer = dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer');
+      assert.equal(footer._prevButtonEnabled(0), false);
+      assert.equal(footer._prevButtonEnabled(1), true);
+    }); 
+  });
 
-        test('New size is selected', function(done) {
-          var paperDatatableApi = fixture('pagination');
-          paperDatatableApi.data = data;
-          paperDatatableApi.oldPage = 0;
-          paperDatatableApi.page = 1;
-          paperDatatableApi.size = 2;
+  test('New size is selected', function(done) {
+    var paperDatatableApi = fixture('pagination');
+    paperDatatableApi.data = data;
+    paperDatatableApi.oldPage = 0;
+    paperDatatableApi.page = 1;
+    paperDatatableApi.size = 2;
+    flush(function() {
+      const footer = dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer');
+      dom(footer.root).querySelector('paper-listbox').select('4');
+      assert.equal(paperDatatableApi.page, 0);
+      assert.equal(paperDatatableApi.size, 4);
+      done();
+    });
+  });
+
+  test('Sort', function(done) {
+    var paperDatatableApi = fixture('pagination');
+    paperDatatableApi.data = data;
+    paperDatatableApi.page = 1;
+    paperDatatableApi.size = 2;
+    flush(function() {
+      var i = 0;
+      paperDatatableApi.addEventListener('sort', function(event) {
+        if (i === 0) {
+          assert.equal(event.detail.sort.property, 'fruit');
+          assert.equal(event.detail.sort.direction, 'asc');
           flush(function() {
-            const footer = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-footer');
-            Polymer.dom(footer.root).querySelector('paper-listbox').select('4');
-            assert.equal(paperDatatableApi.page, 0);
-            assert.equal(paperDatatableApi.size, 4);
-            done();
+            i++;
+            let thContent = dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content[sortable]');
+            dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:arrow-downward"]').click();
           });
-        });
-
-        test('Sort', function(done) {
-          var paperDatatableApi = fixture('pagination');
-          paperDatatableApi.data = data;
-          paperDatatableApi.page = 1;
-          paperDatatableApi.size = 2;
+        } else if (i === 1) {
+          assert.equal(event.detail.sort.property, 'fruit');
+          assert.equal(event.detail.sort.direction, 'desc');
           flush(function() {
-            var i = 0;
-            paperDatatableApi.addEventListener('sort', function(event) {
-              if (i === 0) {
-                assert.equal(event.detail.sort.property, 'fruit');
-                assert.equal(event.detail.sort.direction, 'asc');
-                flush(function() {
-                  i++;
-                  let thContent = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content[sortable]');
-                  Polymer.dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:arrow-downward"]').click();
-                });
-              } else if (i === 1) {
-                assert.equal(event.detail.sort.property, 'fruit');
-                assert.equal(event.detail.sort.direction, 'desc');
-                flush(function() {
-                  i++;
-                  let thContent = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content[sortable]');
-                  Polymer.dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:arrow-downward"]').click();
-                });
-              } else {
-                assert.equal(event.detail.sort.property, undefined);
-                assert.equal(event.detail.sort.direction, undefined);
-                done();
-              }
-            });
-            let thContent = Polymer.dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content[sortable]');
-            Polymer.dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:arrow-downward"]').click();
+            i++;
+            let thContent = dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content[sortable]');
+            dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:arrow-downward"]').click();
           });
-        });
-
+        } else {
+          assert.equal(event.detail.sort.property, undefined);
+          assert.equal(event.detail.sort.direction, undefined);
+          done();
+        }
       });
-    </script>
+      let thContent = dom(paperDatatableApi.root).querySelector('paper-datatable-api-th-content[sortable]');
+      dom(thContent.root).querySelector('div paper-icon-button[icon="paper-datatable-api-icons:arrow-downward"]').click();
+    });
+  });
+
+});
+</script>
   </body>
 </html>

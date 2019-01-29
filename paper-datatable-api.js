@@ -1,8 +1,124 @@
+/**
+
+`paper-datatable-api` is a material design implementation of a data table.
+
+    <link rel="import" href="bower_components/paper-datatable-api/dist/paper-datatable-api-column.html">
+    <link rel="import" href="bower_components/paper-datatable-api/dist/paper-datatable-api.html">
+    <iron-ajax auto url="data.json" last-response="{{data}}"></iron-ajax>
+
+    <paper-datatable-api data="[[data]]">
+      <paper-datatable-api-column header="Fruit" draggable-column property="fruit">
+        <template>
+          <span>{{value}}</span>
+        </template>
+      </paper-datatable-api-column>
+      <paper-datatable-api-column header="Color" property="color">
+        <template>
+          <span>{{value}}</span>
+        </template>
+      </paper-datatable-api-column>
+    </paper-datatable-api>
+
+### Features
+
+- [Follows the guideline of Material Design](https://material.google.com/components/data-tables.html#)
+- Hide/Show columns
+- Choose which columns can be hidden or shown
+- Sort
+- Pagination
+- Checkboxes to select or manipulate data
+- Keep the selected data throught the pages
+- Filter a column
+- Ability to filter columns
+- Drag and drop column
+
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property                                   | Description                                    | Default
+--------------------------------------------------|------------------------------------------------|-------------
+`--paper-datatable-api-checked-checkbox-color`    | Define color of checked checkbox               | `--primary-color`
+`--paper-datatable-api-unchecked-checkbox-color`  | Define color of unchecked checkbox             | `--primary-color`
+`--paper-datatable-api-tr-selected-background`    | Define color of the selected tr                | `--paper-grey-100`
+`--paper-datatable-api-tr-even-background-color`  | Define color of the even trs                   | `none`
+`--paper-datatable-api-tr-odd-background-color`   | Define color of the odd trs                    | `none`
+`--paper-datatable-api-table`                     | Mixin applied to the table element             | `{}`
+`--paper-datatable-api-header`                    | Mixin applied to the columns header            | `{}`
+`--paper-datatable-api-tr-hover-background-color` | Define color of the tr background hover        | `none`
+`--paper-datatable-api-header-sorted`             | Mixin applied to the sorted columns header     | `{}`
+`--paper-datatable-api-custom-td`                 | Mixin applied to the custom style td           | `{}`
+`--paper-datatable-api-checkbox`                  | Mixin applied to the paper-checkbox            | `{}`
+`--paper-datatable-api-horizontal-padding`        | Mixin applied to the horizontal padding        | `26px`
+`--paper-datatable-api-min-width-input-filter`    | Min width of the filter input                  | `120px`
+
+@element paper-datatable-api
+@demo demo/index.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import { PolymerElement } from '@polymer/polymer/polymer-element.js';
+
+import './paper-datatable-api-shared-styles.js';
+import './paper-datatable-api-th-content.js';
+import './paper-datatable-api-footer.js';
+import './paper-datatable-api-icons.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/iron-input/iron-input.js';
+import '@polymer/paper-checkbox/paper-checkbox.js';
+import { AppLocalizeBehavior } from '@polymer/app-localize-behavior/app-localize-behavior.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+import { dom, flush } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+import { mixinBehaviors } from '@polymer/polymer/lib/legacy/class.js';
+import { IronResizableBehavior } from '@polymer/iron-resizable-behavior/iron-resizable-behavior.js';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data.js';
 /* global customElements */
-class DtPaperDatatableApi extends Polymer.mixinBehaviors(
-  [Polymer.AppLocalizeBehavior, Polymer.IronResizableBehavior],
-  Polymer.MutableData(Polymer.Element)
+class DtPaperDatatableApi extends mixinBehaviors(
+  [AppLocalizeBehavior, IronResizableBehavior],
+  MutableData(PolymerElement)
 ) {
+  static get template() {
+    return html`
+    <style include="paper-datatable-api-shared-styles"></style>
+    <style include="iron-flex iron-flex-alignment"></style>
+
+    <table>
+      <thead class\$="[[_generateClass(filters)]]">
+        <tr>
+          <template is="dom-repeat" items="[[_columns]]" as="column" index-as="index">
+            <template is="dom-if" if="[[selectable]]" restamp="">
+              <template is="dom-if" if="[[equals(index, checkboxColumnPosition)]]" restamp="">
+                <th class="selectable">
+                  <div>
+                    <template is="dom-if" if="[[allowTheSelectionOfAllTheElements]]" restamp="">
+                      <paper-checkbox on-change="_selectAllCheckbox"></paper-checkbox>
+                    </template>
+                  </div>
+                </th>
+              </template>
+            </template>
+            <th class\$="[[_generateClass(column.filter)]] pgTh [[_addCustomTdClass(column.tdCustomStyle)]]" data-column="[[column]]" property\$="[[column.property]]" style\$="display: [[_getThDisplayStyle(column.hidden)]];">
+              <paper-datatable-api-th-content column="[[column]]" position-sort-icon="[[positionSortIcon]]" date-format="[[dateFormat]]" sort-direction\$="[[column.sortDirection]]" on-input-change-th-content="_handleInputChange" on-date-input-change-th-content="_handleDateChange" language="[[language]]" sorted\$="[[column.sorted]]" sortable\$="[[column.sortable]]" on-filter-th-content="_handleFilter" on-sort-th-content="_handleSort">
+              </paper-datatable-api-th-content>
+            </th>
+          </template>
+        </tr>
+      </thead>
+
+      <tbody class\$="[[_generateClass(filters)]]">
+      </tbody>
+    </table>
+
+    <template is="dom-if" if="[[paginate]]" restamp="">
+      <paper-datatable-api-footer resources="[[resources]]" language="[[language]]" footer-position="[[footerPosition]]" available-size="[[availableSize]]" total-pages="[[totalPages]]" total-elements="[[totalElements]]" old-page="[[oldPage]]" size="{{size}}" page="{{page}}">
+      </paper-datatable-api-footer>
+    </template>
+`;
+  }
+
   static get is() {
     return 'paper-datatable-api';
   }
@@ -197,7 +313,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
   }
 
   get behaviors() {
-    return [Polymer.AppLocalizeBehavior];
+    return [AppLocalizeBehavior];
   }
 
   static get observers() {
@@ -240,9 +356,9 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
 
   _dataChanged(data) {
     if (this._observer) {
-      Polymer.dom(this).unobserveNodes(this._observer);
+      dom(this).unobserveNodes(this._observer);
     }
-    this._observer = Polymer.dom(this).observeNodes(this._setColumns.bind(this));
+    this._observer = dom(this).observeNodes(this._setColumns.bind(this));
     this._init(data, this.propertiesOrder);
   }
 
@@ -252,7 +368,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
 
   _removeRows() {
     const pgTrs = this.shadowRoot.querySelectorAll('.paper-datatable-api-tr');
-    pgTrs.forEach(pgTr => Polymer.dom(this.shadowRoot.querySelector('tbody')).removeChild(pgTr));
+    pgTrs.forEach(pgTr => dom(this.shadowRoot.querySelector('tbody')).removeChild(pgTr));
   }
 
   _fillRows(data) {
@@ -266,7 +382,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
         this.listen(trLocal, 'mouseout', 'onOutTr');
         this.listen(trLocal, 'tap', 'onTapTr');
 
-        Polymer.dom(this.shadowRoot.querySelector('tbody')).appendChild(trLocal);
+        dom(this.shadowRoot.querySelector('tbody')).appendChild(trLocal);
       });
     }
   }
@@ -325,7 +441,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
 
           tdSelectable.appendChild(paperCheckbox);
           pgTr.appendChild(tdSelectable);
-          Polymer.dom.flush();
+          flush();
         }
 
         const valueFromRowData = this._extractData(rowData, paperDatatableApiColumn.property);
@@ -359,7 +475,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
   }
 
   _selectAllCheckbox(event) {
-    const localTarget = Polymer.dom(event).localTarget;
+    const localTarget = dom(event).localTarget;
     const allPaperCheckbox = this.shadowRoot.querySelectorAll('tbody tr td paper-checkbox');
     allPaperCheckbox.forEach((paperCheckboxParams) => {
       const paperCheckbox = paperCheckboxParams;
@@ -408,12 +524,12 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
   _selectChange(event) {
     let localTarget;
     if (event.type && event.type === 'change') {
-      localTarget = Polymer.dom(event).localTarget;
+      localTarget = dom(event).localTarget;
     } else {
       localTarget = event;
     }
 
-    const tr = Polymer.dom(localTarget).parentNode.parentNode;
+    const tr = dom(localTarget).parentNode.parentNode;
 
     const rowData = localTarget.rowData;
 
@@ -572,7 +688,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
           columnElement => columnElement.property === th.getAttribute('property')
         );
         if (column && column.sortable && column.sorted) {
-          const thContent = Polymer.dom(th).querySelector('paper-datatable-api-th-content');
+          const thContent = dom(th).querySelector('paper-datatable-api-th-content');
           thContent.setAttribute('sort-direction', 'asc');
           thContent.removeAttribute('sorted');
           column.set('sortDirection', undefined);
@@ -629,7 +745,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
       }
 
       if (th) {
-        const thContent = Polymer.dom(th).querySelector('paper-datatable-api-th-content');
+        const thContent = dom(th).querySelector('paper-datatable-api-th-content');
         thContent.setAttribute('sort-direction', 'asc');
         thContent.removeAttribute('sorted');
         column.set('sortDirection', undefined);
@@ -671,7 +787,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
       }
 
       if (th) {
-        const thContent = Polymer.dom(th).querySelector('paper-datatable-api-th-content');
+        const thContent = dom(th).querySelector('paper-datatable-api-th-content');
         thContent.setAttribute('sort-direction', sortDirection);
         thContent.setAttribute('sorted', true);
         column.set('sortDirection', sortDirection);
@@ -888,7 +1004,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
 
         const allTr = this.shadowRoot.querySelectorAll('tbody tr');
         allTr.forEach((tr) => {
-          const allTd = Polymer.dom(tr).querySelectorAll('td');
+          const allTd = dom(tr).querySelectorAll('td');
           this._insertElement(allTd, toIndex, fromIndex);
         });
 
@@ -905,7 +1021,7 @@ class DtPaperDatatableApi extends Polymer.mixinBehaviors(
   }
 
   _generatePropertiesOrder() {
-    Polymer.dom.flush();
+    flush();
     const allTh = this.shadowRoot.querySelectorAll('thead th');
 
     const propertiesOrder = Array.prototype.filter
