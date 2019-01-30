@@ -8,7 +8,7 @@ import '@polymer/paper-item/paper-item-body.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/paper-input/paper-input.js';
-import 'range-datepicker/range-datepicker-input.js';
+// import './node_modules/range-datepicker/range-datepicker-input.js';
 import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 import { flush } from '@polymer/polymer/lib/legacy/polymer.dom.js';
 import { microTask } from '@polymer/polymer/lib/utils/async.js';
@@ -133,6 +133,7 @@ class DtPaperDatatableApiThContent extends mixinBehaviors(
             <paper-input class="flex" value="{{column.activeFilterValue}}" no-label-float="" placeholder="[[column.header]]" on-keyup="_handleKeyDownInput" focused="{{focused}}"></paper-input>
           </template>
         </template>
+       <!-- range picker disabled for polymer 3 compatibility
         <template is="dom-if" if="[[column.date]]" restamp="">
           <range-datepicker-input class="flex" horizontal-align="right" locale="[[language]]" date-format="[[dateFormat]]" date-from="{{_dateFrom}}" date-to="{{_dateTo}}">
             <template>
@@ -140,6 +141,7 @@ class DtPaperDatatableApiThContent extends mixinBehaviors(
             </template>
           </range-datepicker-input>
         </template>
+        -->
       </template>
 
       <!-- Header with filter inactive -->
